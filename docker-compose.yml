@@ -1,0 +1,15 @@
+version: '3'
+services:
+  # Serviço 1: Nossa Aplicação Web
+  web:
+    build: ./app               # Constrói a imagem usando a pasta ./app
+    ports:
+      - "5000:5000"            # Libera a porta 5000 para o nosso PC
+    environment:
+      - REDIS_HOST=redis       # AVISA ao Python que o banco chama-se "redis"
+    depends_on:
+      - redis                  # Só inicia depois que o banco subir
+
+  # Serviço 2: O Banco de Dados
+  redis:
+    image: "redis:alpine"      # Baixa a imagem oficial leve
