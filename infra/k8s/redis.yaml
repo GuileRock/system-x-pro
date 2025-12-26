@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service  # O "DNS" interno. O App vai procurar por este nome!
+spec:
+  selector:
+    app: redis-db
+  ports:
+    - protocol: TCP
+      port: 6379       # Porta padrão do Redis
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-db
+  template:
+    metadata:
+      labels:
+        app: redis-db
+    spec:
+      containers:
+        - name: redis
+          image: redis:alpine # Imagem leve oficial
+          ports:
+            - containerPort: 6379

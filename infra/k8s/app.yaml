@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-x-app
+spec:
+  replicas: 2  # Vamos subir 2 cópias para testar balanceamento!
+  selector:
+    matchLabels:
+      app: system-x-web
+  template:
+    metadata:
+      labels:
+        app: system-x-web
+    spec:
+      containers:
+        - name: web-app
+          # SUA IMAGEM AQUI (Confirme se está igual ao Docker Hub)
+          image: docker.io/gui1984/system-x-app:v1
+          imagePullPolicy: Always # Força baixar a versão mais nova
+          ports:
+            - containerPort: 5000
+          env:
+            # Pega o valor da chave REDIS_HOST dentro do ConfigMap system-x-config
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: system-x-config
+                  key: REDIS_HOST
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-x-service
+spec:
+  type: NodePort # Libera uma porta alta no IP da VM
+  selector:
+    app: system-x-web
+  ports:
+    - protocol: TCP
+      port: 80         # Porta do Serviço (interna)
+      targetPort: 5000 # Porta do Container (onde o Flask roda)
+      nodePort: 30005  # Porta Fixa Externa (para facilitarmos o teste)

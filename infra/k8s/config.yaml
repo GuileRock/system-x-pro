@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: system-x-config
+data:
+  # Aqui definimos que o host é o NOME DO SERVICE que criamos acima
+  REDIS_HOST: "redis-service"
