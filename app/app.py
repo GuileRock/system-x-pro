@@ -1,3 +1,4 @@
+# Gatilho para iniciar o Pipeline CI/CD
 import os
 from flask import Flask
 from redis import Redis
