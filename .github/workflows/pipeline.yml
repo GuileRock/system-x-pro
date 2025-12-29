@@ -1,0 +1,37 @@
+name: System-X Auto Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    # O pipeline só vai rodar se houver mudanças na pasta 'app'
+    # Assim, se você mexer só no Terraform, não precisa rebuildar o Docker!
+    paths:
+      - 'app/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout do Código
+        uses: actions/checkout@v3
+
+      # 2. Faz login no Docker Hub usando as Secrets
+      - name: Login no Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 3. Constrói a imagem e envia
+      - name: Build e Push
+        uses: docker/build-push-action@v4
+        with:
+          # IMPORTANTE: Aponta para a pasta onde está o código Python e o Dockerfile
+          context: ./app
+          push: true
+          # Cria duas tags: 'latest' (sempre a atual) e 'v2' (fixa para exemplo)
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/system-x-app:latest
+            ${{ secrets.DOCKER_USERNAME }}/system-x-app:v2
